@@ -22,7 +22,7 @@ var testCfg = &config.Config{
 }
 
 const testConfig = `[services.web]
-command = "echo hello"
+command = "sleep 30"
 port_range = { min = 19100, max = 19199 }
 proxy_port = 19000
 `
@@ -159,7 +159,7 @@ func TestUpDownCommand(t *testing.T) {
 	setupTestRepo(t)
 	resetRootCmd()
 
-	// Start services (echo hello exits immediately).
+	t.Setenv("PORTREE_STARTUP_GRACE", "200ms")
 	rootCmd.SetArgs([]string{"up"})
 	if err := rootCmd.Execute(); err != nil {
 		t.Fatalf("up command: %v", err)
@@ -204,6 +204,7 @@ func TestUpServiceFilter(t *testing.T) {
 	setupTestRepo(t)
 	resetRootCmd()
 
+	t.Setenv("PORTREE_STARTUP_GRACE", "200ms")
 	rootCmd.SetArgs([]string{"up", "--service", "web"})
 	if err := rootCmd.Execute(); err != nil {
 		t.Fatalf("up --service web: %v", err)

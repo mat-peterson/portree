@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/fairy-pitta/portree/internal/git"
 	"github.com/fairy-pitta/portree/internal/logging"
@@ -35,8 +34,8 @@ var upCmd = &cobra.Command{
 			}
 		}
 
-		stateDir := filepath.Join(repoRoot, ".portree")
-		store, err := state.NewFileStore(stateDir)
+		sd := stateDir()
+		store, err := state.NewFileStore(sd)
 		if err != nil {
 			return fmt.Errorf("creating state store: %w", err)
 		}
@@ -66,6 +65,7 @@ var upCmd = &cobra.Command{
 		}
 
 		totalStarted := 0
+		startFailures := 0
 		for _, tree := range trees {
 			if tree.IsBare {
 				continue
@@ -73,9 +73,14 @@ var upCmd = &cobra.Command{
 			logging.Verbose("starting services for worktree %s (%s)", tree.Branch, tree.Path)
 			results := mgr.StartServices(&tree, upService)
 			for _, r := range results {
-				if r.Err != nil {
+				switch {
+				case r.Err != nil:
 					logging.Error("starting %s/%s: %v", r.Branch, r.Service, r.Err)
-				} else {
+					startFailures++
+				case r.AlreadyRunning:
+					logging.Info("%s already running (port %d, pid %d) for %s", r.Service, r.Port, r.PID, r.Branch)
+					totalStarted++
+				default:
 					logging.Info("Starting %s (port %d) for %s ...", r.Service, r.Port, r.Branch)
 					totalStarted++
 				}
@@ -92,6 +97,14 @@ var upCmd = &cobra.Command{
 			} else {
 				logging.Info("✓ %d %s started for %s", totalStarted, noun, trees[0].Branch)
 			}
+		}
+
+		if startFailures > 0 {
+			noun := "services"
+			if startFailures == 1 {
+				noun = "service"
+			}
+			return fmt.Errorf("%d %s failed to start", startFailures, noun)
 		}
 
 		return nil

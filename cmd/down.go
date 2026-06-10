@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/fairy-pitta/portree/internal/git"
@@ -30,8 +29,8 @@ var downCmd = &cobra.Command{
 			return fmt.Errorf("getting current directory: %w", err)
 		}
 
-		stateDir := filepath.Join(repoRoot, ".portree")
-		store, err := state.NewFileStore(stateDir)
+		sd := stateDir()
+		store, err := state.NewFileStore(sd)
 		if err != nil {
 			return fmt.Errorf("creating state store: %w", err)
 		}

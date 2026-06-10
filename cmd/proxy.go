@@ -34,8 +34,8 @@ The proxy runs until interrupted with Ctrl+C (SIGINT) or SIGTERM.
 Use --https to enable HTTPS with auto-generated certificates, or
 --cert and --key to provide your own certificate and key files.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		stateDir := filepath.Join(repoRoot, ".portree")
-		store, err := state.NewFileStore(stateDir)
+		sd := stateDir()
+		store, err := state.NewFileStore(sd)
 		if err != nil {
 			return fmt.Errorf("creating state store: %w", err)
 		}
@@ -53,7 +53,7 @@ Use --https to enable HTTPS with auto-generated certificates, or
 
 			if certFile == "" {
 				// Auto-generate certificates.
-				certDir := filepath.Join(stateDir, "certs")
+				certDir := filepath.Join(sd, "certs")
 				paths, err := cert.EnsureCerts(certDir)
 				if err != nil {
 					return fmt.Errorf("generating certificates: %w", err)
@@ -152,8 +152,8 @@ var proxyStopCmd = &cobra.Command{
 Sends SIGTERM to the proxy process recorded in the state file
 and updates the state to stopped.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		stateDir := filepath.Join(repoRoot, ".portree")
-		store, err := state.NewFileStore(stateDir)
+		sd := stateDir()
+		store, err := state.NewFileStore(sd)
 		if err != nil {
 			return fmt.Errorf("creating state store: %w", err)
 		}

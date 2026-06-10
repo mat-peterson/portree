@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sort"
 	"text/tabwriter"
 
@@ -47,8 +46,8 @@ Use --json to output the result as a JSON array for scripting and automation.`,
 		}
 
 		// Load state for runtime info.
-		stateDir := filepath.Join(repoRoot, ".portree")
-		store, err := state.NewFileStore(stateDir)
+		sd := stateDir()
+		store, err := state.NewFileStore(sd)
 		if err != nil {
 			return fmt.Errorf("creating state store: %w", err)
 		}

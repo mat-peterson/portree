@@ -335,7 +335,7 @@ func TestModelUpdate_TickMsg(t *testing.T) {
 
 func TestWorktreePath(t *testing.T) {
 	m := testModel(t, nil)
-	m.repoRoot = "/tmp/repo"
+	m.stateRoot = "/tmp/repo"
 	m.trees = []git.Worktree{
 		{Path: "/tmp/repo", Branch: "main"},
 		{Path: "/tmp/repo-feature", Branch: "feature/auth"},
@@ -358,7 +358,7 @@ func TestWorktreePath(t *testing.T) {
 	t.Run("unknown branch", func(t *testing.T) {
 		got := m.worktreePath("nonexistent")
 		if got != "/tmp/repo" {
-			t.Errorf("worktreePath(nonexistent) = %q, want %q (should fall back to repoRoot)", got, "/tmp/repo")
+			t.Errorf("worktreePath(nonexistent) = %q, want %q (should fall back to stateRoot)", got, "/tmp/repo")
 		}
 	})
 }

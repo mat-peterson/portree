@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/fairy-pitta/portree/internal/browser"
 	"github.com/fairy-pitta/portree/internal/git"
@@ -51,8 +50,8 @@ Use --service to specify a different service.`,
 
 		// Determine scheme from proxy state.
 		scheme := "http"
-		stateDir := filepath.Join(repoRoot, ".portree")
-		if store, err := state.NewFileStore(stateDir); err == nil {
+		sd := stateDir()
+		if store, err := state.NewFileStore(sd); err == nil {
 			if err := store.WithLock(func() error {
 				st, e := store.Load()
 				if e != nil {

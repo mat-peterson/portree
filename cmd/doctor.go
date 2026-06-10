@@ -50,9 +50,14 @@ var doctorCmd = &cobra.Command{
 
 			cfgObj, cfgErr := config.Load(root)
 			if cfgErr == nil {
+				// State lives under the main worktree root, shared by all worktrees.
+				sroot, srootErr := git.MainWorktreeRoot(cwd)
+				if srootErr != nil {
+					sroot = root
+				}
 				results = append(results, checkPortConflicts(cfgObj)...)
-				results = append(results, checkStaleState(root))
-				results = append(results, checkStaleWorktrees(root, cwd))
+				results = append(results, checkStaleState(sroot))
+				results = append(results, checkStaleWorktrees(sroot, cwd))
 			}
 		}
 

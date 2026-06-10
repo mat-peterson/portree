@@ -27,13 +27,13 @@ const (
 
 // Model is the top-level Bubble Tea model for the dashboard.
 type Model struct {
-	cfg      *config.Config
-	repoRoot string
-	store    *state.FileStore
-	registry *port.Registry
-	manager  *process.Manager
-	keys     KeyMap
-	trees    []git.Worktree // cached at init
+	cfg       *config.Config
+	stateRoot string
+	store     *state.FileStore
+	registry  *port.Registry
+	manager   *process.Manager
+	keys      KeyMap
+	trees     []git.Worktree // cached at init
 
 	rows         []ServiceRow
 	cursor       int
@@ -45,8 +45,8 @@ type Model struct {
 }
 
 // NewModel creates a new dashboard model.
-func NewModel(cfg *config.Config, repoRoot string) (*Model, error) {
-	stateDir := filepath.Join(repoRoot, ".portree")
+func NewModel(cfg *config.Config, stateRoot string) (*Model, error) {
+	stateDir := filepath.Join(stateRoot, ".portree")
 	store, err := state.NewFileStore(stateDir)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func NewModel(cfg *config.Config, repoRoot string) (*Model, error) {
 
 	return &Model{
 		cfg:        cfg,
-		repoRoot:   repoRoot,
+		stateRoot:  stateRoot,
 		store:      store,
 		registry:   registry,
 		manager:    mgr,
@@ -408,12 +408,12 @@ func (m *Model) worktreePath(branch string) string {
 			return t.Path
 		}
 	}
-	return m.repoRoot
+	return m.stateRoot
 }
 
 // Run launches the Bubble Tea program.
-func Run(cfg *config.Config, repoRoot string) error {
-	model, err := NewModel(cfg, repoRoot)
+func Run(cfg *config.Config, stateRoot string) error {
+	model, err := NewModel(cfg, stateRoot)
 	if err != nil {
 		return err
 	}
