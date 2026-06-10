@@ -12,7 +12,11 @@ func TestIsFree(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		p := ln.Addr().(*net.TCPAddr).Port
+		addr, ok := ln.Addr().(*net.TCPAddr)
+		if !ok {
+			t.Fatal("expected *net.TCPAddr")
+		}
+		p := addr.Port
 		_ = ln.Close()
 		if !IsFree(p) {
 			t.Errorf("IsFree(%d) = false for a released port", p)
@@ -27,7 +31,11 @@ func TestIsFree(t *testing.T) {
 			t.Fatal(err)
 		}
 		defer func() { _ = ln.Close() }()
-		p := ln.Addr().(*net.TCPAddr).Port
+		addr, ok := ln.Addr().(*net.TCPAddr)
+		if !ok {
+			t.Fatal("expected *net.TCPAddr")
+		}
+		p := addr.Port
 		if IsFree(p) {
 			t.Errorf("IsFree(%d) = true while a wildcard listener holds the port", p)
 		}
@@ -42,7 +50,11 @@ func TestIsFree(t *testing.T) {
 			t.Fatal(err)
 		}
 		defer func() { _ = ln.Close() }()
-		p := ln.Addr().(*net.TCPAddr).Port
+		addr, ok := ln.Addr().(*net.TCPAddr)
+		if !ok {
+			t.Fatal("expected *net.TCPAddr")
+		}
+		p := addr.Port
 		if IsFree(p) {
 			t.Errorf("IsFree(%d) = true while a 127.0.0.1 listener holds the port", p)
 		}
